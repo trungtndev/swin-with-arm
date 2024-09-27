@@ -3,7 +3,7 @@ from torch.utils.data.dataset import Dataset
 
 from .transforms import (ScaleAugmentation,
                          ScaleToLimitRange,
-                         swinTransform)
+                         augmentation_options)
 
 K_MIN = 0.7
 K_MAX = 1.4
@@ -20,10 +20,18 @@ class CROHMEDataset(Dataset):
         self.ds = ds
 
         trans_list = []
+        trans_list.append(tr.ToTensor())
+
         if is_train and scale_aug:
             trans_list.append(ScaleAugmentation(K_MIN, K_MAX))
 
-        trans_list += swinTransform
+        if is_train:
+            trans_list.append(augmentation_options)
+        trans_list += [
+            tr.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225]),
+            tr.Resize((224, 224)),
+        ]
         self.transform = tr.Compose(trans_list)
 
     def __getitem__(self, idx):
