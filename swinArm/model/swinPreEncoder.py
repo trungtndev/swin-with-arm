@@ -42,6 +42,7 @@ class SwinV1Encoder(pl.LightningModule):
         self.swinv1.head = torch.nn.Sequential(
             torch.nn.Linear(768, d_model),
             torch.nn.LayerNorm(d_model),
+            torch.nn.Dropout(drop_rate),
         )
 
     def forward(self, img, img_mask):
